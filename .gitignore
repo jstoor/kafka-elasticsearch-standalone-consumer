@@ -1,4 +1,5 @@
 # Build and Package Files
+bin/
 build/
 target/
 velocity.log
