@@ -1,4 +1,25 @@
-#!/bin/sh
+#!/bin/bash
+
+do_start()
+{
+      #echo $EXEC -home "$JAVA_HOME" -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $CLASS $1 $2
+      echo "Starting the Consume Daemon. Please wait......"
+      $EXEC -home "$JAVA_HOME" $JVM_OPTIONS -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $CLASS $1
+      echo "*** Start attempt completed.,"
+      echo "*** Please check "$LOG_OUT" file for start confirmation and "
+      echo $LOG_ERR" for errors in case of failure ***"
+}
+
+
+do_stop()
+{
+      #echo $EXEC -home "$JAVA_HOME" -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID -stop $CLASS
+      echo "Stopping the Consumer Daemon. Please wait......"
+      $EXEC -home "$JAVA_HOME" $JVM_OPTIONS -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID -verbose -stop $CLASS
+      echo "*** Stop attempt completed.,"
+      echo "*** Please check "$LOG_OUT" file for stop confirmation and "
+      echo $LOG_ERR" for errors in case of failure ***"
+}
 
 while getopts p:c: option
 do
@@ -8,6 +29,9 @@ do
                 c) CONFIG_FILE=${OPTARG};;
         esac
 done
+
+# Remote debugging
+JVM_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5025
 
 ### Trim leading whitespaces ###
 OPERATION="${OPERATION##*( )}"
@@ -65,7 +89,7 @@ CLASS_PATH=$libClassPath:$base_dir"/config":$base_dir
 CLASS=org.elasticsearch.kafka.consumer.daemon.KafkaConsumerDaemon
 
 #User as which the Consumer Daemon has to be run
-USER=kraj
+USER=vagrant
 
 #This file stores the Process ID of the Consumer Daemon
 PID=$PROCESS_LOG_DIR/$CONSUMER_GROUP_NAME"_"$KAFKA_TOPIC"_"$TOPIC_PARTITION".pid"
@@ -101,24 +125,3 @@ case "$OPERATION" in
             exit 3
             ;;
 esac
-
-do_start()
-{
-      #echo $EXEC -home "$JAVA_HOME" -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $CLASS $1 $2
-      echo "Starting the Consume Daemon. Please wait......"
-      $EXEC -home "$JAVA_HOME" -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID $CLASS $1
-      echo "*** Start attempt completed.,"
-      echo "*** Please check "$LOG_OUT" file for start confirmation and "
-      echo $LOG_ERR" for errors in case of failure ***"
-}
-
-
-do_stop()
-{
-      #echo $EXEC -home "$JAVA_HOME" -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID -stop $CLASS
-      echo "Stopping the Consumer Daemon. Please wait......"
-      $EXEC -home "$JAVA_HOME" -cp $CLASS_PATH -user $USER -outfile $LOG_OUT -errfile $LOG_ERR -pidfile $PID -verbose -stop $CLASS
-      echo "*** Stop attempt completed.,"
-      echo "*** Please check "$LOG_OUT" file for stop confirmation and "
-      echo $LOG_ERR" for errors in case of failure ***"
-}

@@ -12,9 +12,9 @@ import org.apache.log4j.Logger;
 public class KafkaConsumerDaemon implements Daemon {
 	
 	private Thread kafkaConsumerThread; 
-	private boolean stopped = false;
+	private volatile boolean stopped = false;
 	public ConsumerJob kafkaConsumerJob = null;
-	private boolean isConsumeJobInProgress = false;
+	private volatile boolean isConsumeJobInProgress = false;
 	Logger logger;
 	
 	@Override
