@@ -30,9 +30,6 @@ do
         esac
 done
 
-# Remote debugging
-JVM_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5025
-
 ### Trim leading whitespaces ###
 OPERATION="${OPERATION##*( )}"
 CONFIG_FILE="${CONFIG_FILE##*( )}"
@@ -99,6 +96,11 @@ LOG_OUT=$PROCESS_LOG_DIR/$CONSUMER_GROUP_NAME"_"$KAFKA_TOPIC"_"$TOPIC_PARTITION"
 
 #This file contains the errors when starting|stopping|restarting the consumer daemon
 LOG_ERR=$PROCESS_LOG_DIR/$CONSUMER_GROUP_NAME"_"$KAFKA_TOPIC"_"$TOPIC_PARTITION".err"
+
+# Remote debugging
+BASE_JDWP_PORT=5020         # TODO port range allocation
+JDWP_PORT=$((BASE_JDWP_PORT + TOPIC_PARTITION))
+JVM_OPTIONS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=${JDWP_PORT}"
 
 echo $PID
 echo $LOG_OUT
